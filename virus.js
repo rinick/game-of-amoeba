@@ -7,8 +7,8 @@ let cwidth = Math.pow(2, Math.ceil(Math.log2(cwidth0)));
 let cheight = Math.pow(2, Math.ceil(Math.log2(cheight0)));
 
 // center of screen on the image
-let cwidth2 = cwidth0 / 2;
-let cheight2 = cheight - cheight0 / 2;
+let cwidth2 = Math.round(cwidth0 / 2);
+let cheight2 = Math.round(cheight - cheight0 / 2);
 
 c.width = cwidth;
 c.height = cheight;
@@ -37,6 +37,7 @@ const state = (Array(2)).fill().map(() =>
     }),
     depthStencil: false
   }));
+
 
 const updateLife = regl({
   frag: `precision mediump float;
