@@ -46,9 +46,10 @@ const updateLife = regl({
   const float dx=${'1./' + cwidth + '.'}, dy=${'1./' + cheight + '.'}, st = 1./255.5;
 
   const float nn = 16.;
-  const float n1 = 0.0625;
-  const float n2 = 0.125;
-  const float n3 = 0.1875;
+  const float n1 = ${1 / 16};
+  const float n2 = ${2 / 16};
+  const float n3 = ${3 / 16};
+  
   int v1 = 0; // cytoplasm
   int v2 = 0; // virus
   int v3 = 0; // wall
