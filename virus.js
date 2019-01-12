@@ -163,9 +163,69 @@ const setupQuad = regl({
   count: 3
 });
 
-regl.frame(() => {
+
+let timer, delay = 50;
+
+function runFrame(event) {
+  clearTimeout(timer);
+  regl.poll();
   setupQuad(() => {
-    regl.draw()
-    updateLife()
-  })
-});
+    regl.draw();
+    updateLife();
+  });
+  switch (delay) {
+    case 0:
+      // no auto frame
+      return;
+    case 1:
+      // fast
+      timer = setTimeout(runFrame, delay);
+      break;
+    default:
+      timer = setTimeout("requestAnimationFrame(runFrame)", delay);
+  }
+}
+
+function initHash() {
+  let hash = document.location.hash.substr(1);
+  if (hash === 'noad') {
+    document.querySelector('#menu').style.display = 'none';
+    return;
+  }
+  let sp = parseInt(hash);
+  if (sp >= 0) {
+    delay = sp;
+    let spid = '0';
+    if (sp < 10) {
+      spid = '7';
+    } else if (sp < 30) {
+      spid = '6';
+    } else if (sp < 100) {
+      spid = '5';
+    } else if (sp < 300) {
+      spid = '4';
+    } else if (sp < 700) {
+      spid = '3';
+    } else if (sp < 2000) {
+      spid = '2';
+    } else if (sp > 0) {
+      spid = '1';
+    }
+    document.querySelector('#spd' + spid).checked = true;
+  }
+}
+
+function onHashChange() {
+  let sp = parseInt(document.location.hash.substr(1));
+  if (sp >= 0) {
+    delay = sp;
+  }
+  runFrame();
+}
+
+setTimeout(() => {
+  initHash();
+  runFrame();
+}, 30);
+
+c.addEventListener('click', runFrame);
