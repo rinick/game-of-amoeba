@@ -161,7 +161,7 @@ const updateLife = regl({
               } else if (vWas[1] > 0 && vLqs[0] < vLqs[1]) {
                 rslt = nWa1;
               }
-            } else if (vLq == 6 || (vLqs[0] >0 && vLqs[1]>0)) {
+            } else if (vLq == 7 || (vLqs[0] >0 && vLqs[1]>0)) {
               if (vLqs[0] > vLqs[1]) {
                 rslt = nWa0;
               } else if (vLqs[0] < vLqs[1]) { 
@@ -180,8 +180,10 @@ const updateLife = regl({
                 rslt = nLq1;
             } else if (vLqs[0] > vLqs[1]) {
               rslt = nLq0;
-            } else {
+            } else if (vLqs[0] < vLqs[1]){
               rslt = nLq1;
+            } else {
+              rslt = 0.0;
             }
           } else {
             rslt = 0.0;
