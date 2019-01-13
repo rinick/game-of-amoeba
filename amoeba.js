@@ -1,7 +1,7 @@
 let c = document.getElementById("c");
 
-let cwidth0 = Math.ceil(window.innerWidth / 3);
-let cheight0 = Math.ceil(window.innerHeight / 3);
+let cwidth0 = Math.ceil(window.innerWidth / 2);
+let cheight0 = Math.ceil(window.innerHeight / 2);
 
 let cwidth = Math.pow(2, Math.ceil(Math.log2(cwidth0)));
 let cheight = Math.pow(2, Math.ceil(Math.log2(cheight0)));
@@ -12,8 +12,8 @@ let cheight2 = Math.round(cheight - cheight0 / 2);
 
 c.width = cwidth;
 c.height = cheight;
-c.style.width = cwidth * 3 + 'px';
-c.style.height = cheight * 3 + 'px';
+c.style.width = cwidth * 2 + 'px';
+c.style.height = cheight * 2 + 'px';
 
 const regl = createREGL({
   canvas: c,
@@ -26,8 +26,8 @@ function randomInit() {
   return Math.round(fillTarget[Math.floor(Math.random() * fillTarget.length)] * 255 / 16);
 }
 
-const RADIUS = 60;
-const DISTANCE = 80;
+const RADIUS = 80;
+const DISTANCE = 90;
 
 const INITIAL_CONDITIONS = (Array(cwidth * cheight * 4)).fill(0);
 
@@ -161,10 +161,10 @@ const updateLife = regl({
               } else if (vWas[1] > 0 && vLqs[0] < vLqs[1]) {
                 rslt = nWa1;
               }
-            } else if (vLq == 5) {
+            } else if (vLq == 6 || (vLqs[0] >0 && vLqs[1]>0)) {
               if (vLqs[0] > vLqs[1]) {
                 rslt = nWa0;
-              } else { 
+              } else if (vLqs[0] < vLqs[1]) { 
                 rslt = nWa1;
               }
             }
@@ -218,6 +218,30 @@ function convertColor(c) {
 }
 */
 
+/*
+// raw color
+uniform sampler2D prevState;
+  varying vec2 uv;
+  void main() {
+    vec4 old = texture2D(prevState, uv);
+    int v =  int(old[0]*16.0 + 0.5);
+    if (v == 5){
+      gl_FragColor = vec4(0.04,0.43,0.85,1.0);
+    } else if (v == 6) {
+      gl_FragColor = vec4(0.25,0.66,1.00,1.0);
+    } else if (v == 7) {
+      gl_FragColor = vec4(0.57,0.84,1.00,1.0);
+    } else if (v == 9) {
+     gl_FragColor = vec4(0.81,0.07,0.13,1.0);
+    } else if (v == 10) {
+      gl_FragColor = vec4(1.00,0.30,0.31,1.0);
+    } else if (v == 11) {
+      gl_FragColor = vec4(1.00,0.64,0.62,1.0);
+    }else {
+      gl_FragColor = vec4(0.0,0.0,0.0,1.0);
+    }
+  }
+ */
 const setupQuad = regl({
   frag: `precision mediump float;
   uniform sampler2D prevState;
@@ -229,16 +253,12 @@ const setupQuad = regl({
     int v2 =  int(old[2]*16.0 + 0.5);
     int v3 =  int(old[3]*16.0 + 0.5);
     
-    if (v == 5){
+    if (v == 6 && v1 == 6 && v2 == 6 && v3 == 6) {
       gl_FragColor = vec4(0.04,0.43,0.85,1.0);
-    } else if (v == 6) {
-      gl_FragColor = vec4(0.25,0.66,1.00,1.0);
     } else if (v == 7) {
       gl_FragColor = vec4(0.57,0.84,1.00,1.0);
-    } else if (v == 9) {
-     gl_FragColor = vec4(0.81,0.07,0.13,1.0);
-    } else if (v == 10) {
-      gl_FragColor = vec4(1.00,0.30,0.31,1.0);
+    } else if (v == 10 && v1 == 10 && v2 == 10 && v3 == 10) {
+      gl_FragColor = vec4(0.81,0.07,0.13,1.0);
     } else if (v == 11) {
       gl_FragColor = vec4(1.00,0.64,0.62,1.0);
     }else {
