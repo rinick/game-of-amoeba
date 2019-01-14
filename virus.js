@@ -199,7 +199,7 @@ function initHash() {
     let spid = '5';
     if (sp === 0) {
       spid = '0';
-    } if (sp < 10) {
+    } else if (sp < 10) {
       spid = '7';
     } else if (sp < 30) {
       spid = '6';

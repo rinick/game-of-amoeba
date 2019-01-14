@@ -20,14 +20,14 @@ const regl = createREGL({
 
 });
 
-let fillTarget = [0, 5, 6, 7, 9, 10, 11];
+let fillTarget = [];
 
 function randomInit() {
   return Math.round(fillTarget[Math.floor(Math.random() * fillTarget.length)] * 255 / 16);
 }
 
-const RADIUS = 80;
-const DISTANCE = 90;
+const RADIUS = 295;
+const DISTANCE = 300;
 
 const INITIAL_CONDITIONS = (Array(cwidth * cheight * 4)).fill(0);
 
@@ -63,6 +63,8 @@ const updateLife = regl({
 
   const float nn = 16.;
   
+  const float nDisease = ${4 / 16};
+    
   const float nLq0 = ${5 / 16};
   const float nLif0 = ${6 / 16};
   const float nWa0 = ${7 / 16};
@@ -71,17 +73,21 @@ const updateLife = regl({
   const float nLif1 = ${10 / 16};
   const float nWa1 = ${11 / 16};
 
+  const float nRock = 1.0;
   
   ivec2 vLqs = ivec2(0,0); // liquid
   ivec2 vLifs = ivec2(0,0); // core 
   ivec2 vWas = ivec2(0,0); // wall 
+  int vDisease = 0;
   
 
   void countP(vec2 pt){
     vec4 c = texture2D(prevState, pt);
     float v = c[0]*nn;
-    if (v  < 4.5) {
-
+    if (v  < 3.5) {
+      
+    } else if (v  < 4.5) {
+      vDisease = vDisease + 1;
     } else if (v  < 5.5) {
       vLqs[0] = vLqs[0] + 1;
     } else if (v  < 6.5) {
@@ -100,6 +106,14 @@ const updateLife = regl({
   }
   void main(void) {
    
+     vec4 old = texture2D(prevState, uv);
+     int v =  int(old[0]*nn + 0.5);
+     
+     if (v > 12) {
+       gl_FragColor = old;
+       return;
+     }
+     
      countP(uv + vec2(0., dy));
      countP(uv - vec2(0., dy));
      countP(uv + vec2(dx, 0.));
@@ -109,8 +123,7 @@ const updateLife = regl({
      countP(uv + vec2(dx, -dy));
      countP(uv - vec2(dx, -dy));
 
-     vec4 old = texture2D(prevState, uv);
-     int v =  int(old[0]*nn + 0.5);
+
      
      int vLq = vLqs[0] + vLqs[1];
      int vWa = vWas[0] + vWas[1];
@@ -134,16 +147,29 @@ const updateLife = regl({
      int vWaOther = vWa - vWaMe;
    
      float rslt = 0.0;
-     int type = int(mod(float(v),4.0));
-     
-     if (type <= 1){
+     int type = 0;
+     if (v > 4) {
+       type = int(mod(float(v),4.0));
+     }
+
+     if (v == 4) {
+       if ( vWa > 0 || vLq > 0) {
+         rslt = nDisease;
+       } else {
+         rslt = 0.0;
+       } 
+     } else if (vDisease > 0 && ( type == 2 || type == 3 || 
+                  (type == 1 && (vLif + vWa < 2)) // allow liquid to survive in some case, which help disease to spread more
+               )) {
+       rslt = nDisease;
+     } else if (type <= 1){
       if (vLif == 3) {
        if (vLifs[0] > vLifs[1]) {
           rslt = nLif0;
         } else {
           rslt = nLif1;
         }
-      } else if (type == 1){
+      } else if (type == 1) {
         if (vLif > 3 || vLifOther > 1 || vWaOther > 0 || vLqMe == 0){
           rslt = 0.0;
         } else {
@@ -191,13 +217,15 @@ const updateLife = regl({
         }
       }
     } else if (type == 2) {
-      if (vLqMe <= vLqOther) { // vLq* 5 - 1 < vLif) {
+      if (vLqMe <= vLqOther) {
         rslt = 0.0;
       } else {
         rslt = old[0];
       }
     } else if (type == 3) {
-      if (vLif > 1) {
+      if ( vLqOther == 6 && vLqMe == 1) {
+        rslt = nDisease; // disease occur
+      } else if (vLif > 1) {
         rslt = 0.0;
       } else {
         rslt = old[0];
@@ -211,14 +239,14 @@ const updateLife = regl({
   framebuffer: ({tick}) => state[(tick + 1) % 2]
 });
 
-/*
-function convertColor(c) {
+
+function hex2vec4(c) {
   let r = (parseInt(c.substr(1,2),16)/255).toFixed(2);
   let g =  (parseInt(c.substr(3,2),16)/255).toFixed(2);
   let b =  (parseInt(c.substr(5,2),16)/255).toFixed(2);
-  console.log(`vec4(${r},${g},${b},1.0);`)
+  return `vec4(${r},${g},${b},1.0);`;
 }
-*/
+
 
 /*
 // raw color
@@ -244,27 +272,31 @@ uniform sampler2D prevState;
     }
   }
  */
-const setupQuad = regl({
+const setupQuadRaw = regl({
   frag: `precision mediump float;
   uniform sampler2D prevState;
   varying vec2 uv;
   void main() {
     vec4 old = texture2D(prevState, uv);
     int v =  int(old[0]*16.0 + 0.5);
-    int v1 =  int(old[1]*16.0 + 0.5);
-    int v2 =  int(old[2]*16.0 + 0.5);
-    int v3 =  int(old[3]*16.0 + 0.5);
-    
-    if (v == 6 && v1 == 6 && v2 == 6 && v3 == 6) {
-      gl_FragColor = vec4(0.04,0.43,0.85,1.0);
+    if (v == 5){
+      gl_FragColor = ${hex2vec4('#003a8c')};
+    } else if (v == 6) {
+      gl_FragColor = ${hex2vec4('#096dd9')};
     } else if (v == 7) {
-      gl_FragColor = vec4(0.57,0.84,1.00,1.0);
-    } else if (v == 10 && v1 == 10 && v2 == 10 && v3 == 10) {
-      gl_FragColor = vec4(0.81,0.07,0.13,1.0);
+      gl_FragColor = ${hex2vec4('#91d5ff')};
+    } else if (v == 9) {
+     gl_FragColor = ${hex2vec4('#820014')};
+    } else if (v == 10) {
+      gl_FragColor =${hex2vec4('#cf1322')};
     } else if (v == 11) {
-      gl_FragColor = vec4(1.00,0.64,0.62,1.0);
-    }else {
-      gl_FragColor = vec4(0.0,0.0,0.0,1.0);
+      gl_FragColor = ${hex2vec4('#ffa39e')};
+    } else if (v == 4) {
+      gl_FragColor = ${hex2vec4('#ff00ff')}; // disease
+    } else if (v == 16) {
+      gl_FragColor = ${hex2vec4('#ffffff')};
+    } else {
+      gl_FragColor = ${hex2vec4('#000000')};
     }
   }`,
 
@@ -296,7 +328,7 @@ let timer, delay = 50;
 function runFrame(event) {
   clearTimeout(timer);
   regl.poll();
-  setupQuad(() => {
+  setupQuadRaw(() => {
     regl.draw();
     updateLife();
   });
@@ -325,8 +357,7 @@ function initHash() {
     let spid = '5';
     if (sp === 0) {
       spid = '0';
-    }
-    if (sp < 10) {
+    } else if (sp < 10) {
       spid = '7';
     } else if (sp < 30) {
       spid = '6';
@@ -349,8 +380,10 @@ function onHashChange() {
   let sp = parseInt(document.location.hash.substr(1));
   if (sp >= 0) {
     delay = sp;
+    runFrame();
+  } else {
+    clearTimeout(timer);
   }
-  runFrame();
 }
 
 setTimeout(() => {
