@@ -26,8 +26,8 @@ function randomInit() {
   return Math.round(fillTarget[Math.floor(Math.random() * fillTarget.length)] * 255 / 16);
 }
 
-const RADIUS = 295;
-const DISTANCE = 300;
+const RADIUS = 30;
+const DISTANCE = 120;
 
 const INITIAL_CONDITIONS = (Array(cwidth * cheight * 4)).fill(0);
 
@@ -153,24 +153,24 @@ const updateLife = regl({
      }
 
      if (v == 4) {
-       if ( vWa > 0 || vLq > 0) {
+       if ( vWa > 0 && vDisease > 2) {      // use > 2 to adjust disease's scale
          rslt = nDisease;
        } else {
          rslt = 0.0;
        } 
-     } else if (vDisease > 0 && ( type == 2 || type == 3 || 
-                  (type == 1 && (vLif + vWa < 2)) // allow liquid to survive in some case, which help disease to spread more
+     } else if (vDisease > 0 && ( type == 2 || type == 3 || type == 1
+                  || (v == 0 && vDisease == 3 && vWa > 0)
                )) {
-       rslt = nDisease;
+       rslt = nDisease;      // disease spread
      } else if (type <= 1){
-      if (vLif == 3) {
+      if (vLif == 3) {      // life grows at 3 neighbors, even when one of them is enemy
        if (vLifs[0] > vLifs[1]) {
           rslt = nLif0;
         } else {
           rslt = nLif1;
         }
       } else if (type == 1) {
-        if (vLif > 3 || vLifOther > 1 || vWaOther > 0 || vLqMe == 0){
+        if (vLif > 3 || vLifOther > 1 || vWaOther > 0 || vLqMe == 0) {      // liquid may be consumed
           rslt = 0.0;
         } else {
           rslt = old[0];
@@ -179,15 +179,14 @@ const updateLife = regl({
         if (vLq == 0) {
           rslt = 0.0;
         } else {
-          if (vLif == 0) {
-            // build wall
-            if (vWa > 0) {
+          if (vLif == 0) {      // try building wall
+            if (vWa > 0) {      // wall spread along liquid
               if (vWas[0] > 0 && vLqs[0] > vLqs[1]) {
                 rslt = nWa0;
               } else if (vWas[1] > 0 && vLqs[0] < vLqs[1]) {
                 rslt = nWa1;
               }
-            } else if (vLq == 7 || (vLqs[0] >0 && vLqs[1]>0)) {
+            } else if (vLq == 7 || (vLqs[0] >0 && vLqs[1]>0)) {      // wall generated from just liquid
               if (vLqs[0] > vLqs[1]) {
                 rslt = nWa0;
               } else if (vLqs[0] < vLqs[1]) { 
@@ -199,7 +198,7 @@ const updateLife = regl({
               return;
             }
           }
-          if (vLq == 3  || (vLif > 0 && vLif < 3)) {
+          if (vLq == 3 || (vLif > 0 && vLif < 3)) {      // liquid spread
             if (vLifs[0] > vLifs[1]) {
                 rslt = nLq0;
             } else if (vLifs[0] < vLifs[1]) {
@@ -217,15 +216,15 @@ const updateLife = regl({
         }
       }
     } else if (type == 2) {
-      if (vLqMe <= vLqOther) {
+      if (vLqMe <= vLqOther) {      // life need water to sustain
         rslt = 0.0;
       } else {
         rslt = old[0];
       }
     } else if (type == 3) {
-      if ( vLqOther == 6 && vLqMe == 1) {
-        rslt = nDisease; // disease occur
-      } else if (vLif > 1) {
+      if ( vLqOther == 6 && vLqMe == 1) {      // disease occur
+        rslt = nDisease;
+      } else if (vLif > 1) {      // wall broken by life
         rslt = 0.0;
       } else {
         rslt = old[0];
