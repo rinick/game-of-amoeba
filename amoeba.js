@@ -43,6 +43,15 @@ for (let i = cwidth2 + DISTANCE - RADIUS; i < cwidth2 + DISTANCE + RADIUS; i++)
     INITIAL_CONDITIONS[(i + j * cwidth) * 4] = randomInit();
   }
 
+
+// draw a border
+for (let i = 0; i = cwidth; ++i) {
+  INITIAL_CONDITIONS[i * 4] = 255;
+}
+for (let i = 1; i <= cheight; ++i) {
+  INITIAL_CONDITIONS[(i * cwidth - 1) * 4] = 255;
+}
+
 const state = (Array(2)).fill().map(() =>
   regl.framebuffer({
     color: regl.texture({
@@ -240,9 +249,9 @@ const updateLife = regl({
 
 
 function hex2vec4(c) {
-  let r = (parseInt(c.substr(1,2),16)/255).toFixed(2);
-  let g =  (parseInt(c.substr(3,2),16)/255).toFixed(2);
-  let b =  (parseInt(c.substr(5,2),16)/255).toFixed(2);
+  let r = (parseInt(c.substr(1, 2), 16) / 255).toFixed(2);
+  let g = (parseInt(c.substr(3, 2), 16) / 255).toFixed(2);
+  let b = (parseInt(c.substr(5, 2), 16) / 255).toFixed(2);
   return `vec4(${r},${g},${b},1.0);`;
 }
 
