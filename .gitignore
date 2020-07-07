@@ -1,1 +1,8 @@
 /.idea
+/node_modules/
+/.cache/
+/.parcel-cache/
+/build/
+/dist/
+/temp/
+/yarn-error.log

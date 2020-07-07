@@ -1,0 +1,25 @@
+body,
+#app {
+  height: 100%;
+}
+.ant-layout-sider {
+  position: absolute;
+  right: 0;
+  height: 100%;
+}
+.sider {
+  padding: 12px;
+}
+.sider-item {
+  margin: 12px 0;
+  display: flex;
+  align-items: center;
+}
+
+.sider-item > * {
+  flex-grow: 1;
+  margin-left: 8px;
+}
+.sider-item > *:first-child {
+  margin-left: 0;
+}
