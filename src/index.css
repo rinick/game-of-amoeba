@@ -1,12 +1,22 @@
 body,
-#app {
+#app,
+.stage-layout {
   height: 100%;
+  overflow: hidden;
 }
-.ant-layout-sider {
+.ant-layout-sider-below {
   position: absolute;
   right: 0;
   height: 100%;
+  background: rgba(255, 255, 255, 0.96);
 }
+.ant-layout-sider-zero-width-trigger {
+  opacity: 0.8;
+}
+.ant-layout-sider-zero-width-trigger:hover {
+  opacity: 1;
+}
+
 .sider {
   padding: 12px;
 }
@@ -22,4 +32,25 @@ body,
 }
 .sider-item > *:first-child {
   margin-left: 0;
+}
+
+.content-stage {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /*background: #333;*/
+}
+canvas.pixelated {
+  image-rendering: optimizeSpeed;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: pixelated;
+}
+.canvas-scale-h {
+  height: 100%;
+}
+.canvas-scale-v {
+  width: 100%;
 }

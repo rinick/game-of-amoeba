@@ -27,11 +27,11 @@ interface Props {}
 
 export const App = (props: Props) => {
   return (
-    <Layout>
+    <Layout className="stage-layout">
       <Content>
         <Stage />
       </Content>
-      <Sider breakpoint="lg" collapsedWidth="0" reverseArrow>
+      <Sider breakpoint="lg" collapsedWidth="0" reverseArrow theme="light">
         <div className="sider">
           <div className="sider-item">
             <Button type="primary" icon={<CaretRightOutlined />}>
