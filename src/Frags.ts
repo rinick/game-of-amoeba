@@ -100,7 +100,7 @@ export const mainFrag = `precision mediump float;
          rslt = 0.0;
        } 
      } else if (vVirus > 0 && ( type == 2 || type == 3 || type == 1
-                  || (v == 0 && vVirus == 3 && vWa > 0)
+                //  || (v == 0 && vVirus == 3 && vWa > 0)
                )) {
        rslt = nVirus;      // virus spread
      } else if (type <= 1){

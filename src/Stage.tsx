@@ -13,23 +13,27 @@ interface State {
 }
 
 export class Stage extends React.PureComponent<Props, State> {
-  state: State = {imgH: 64, imgW: 64, canvasScale: 'h', delay: 100, pixelated: true};
+  state: State = {imgW: 64, imgH: 64, canvasScale: 'h', delay: 160, pixelated: true};
   resizeObserver: any;
   shader: Shader;
 
   timeout: any;
 
   startTimer = () => {
-    let {delay} = this.state;
     if (this.timeout) {
       clearTimeout(this.timeout);
+      this.timeout = null;
     }
+    if (!this.mounted) {
+      return;
+    }
+
+    let {delay} = this.state;
     if (delay != Infinity) {
       this.timeout = setTimeout(this.updateShader, delay);
     }
   };
   updateShader = () => {
-    this.timeout = null;
     this.shader?.update();
     this.startTimer();
   };
@@ -56,12 +60,20 @@ export class Stage extends React.PureComponent<Props, State> {
       this.setState({canvasScale: 'v', pixelated});
     }
   };
-
+  updateSpeed(delay: number) {
+    this.setState({delay}, this.startTimer);
+  }
+  step() {
+    this.shader?.update();
+  }
+  mounted = false;
   componentDidMount() {
+    let {imgW, imgH, canvasScale, pixelated} = this.state;
     this.resizeObserver = new ResizeObserver(this.handleResize);
     this.resizeObserver.observe(this._rootNode);
+    this.mounted = true;
     this.shader = new Shader(this._canvasNode);
-    this.shader.init(64, 64);
+    this.shader.init(imgW, imgH);
     this.startTimer();
   }
 
@@ -73,5 +85,12 @@ export class Stage extends React.PureComponent<Props, State> {
         <canvas className={cls} ref={this.getCanvasRef} width={imgW} height={imgH} />
       </div>
     );
+  }
+
+  componentWillUnmount() {
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+    }
+    this.mounted = false;
   }
 }

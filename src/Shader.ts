@@ -63,8 +63,10 @@ export class Shader {
     this.useVirus = virus;
 
     const INITIAL_CONDITIONS = Array(width * height * 4).fill(0);
-    for (let i = 0; i < INITIAL_CONDITIONS.length; ++i) {
-      INITIAL_CONDITIONS[i] = [5 * 16, 6 * 16, 7 * 16, 9 * 16, 10 * 16, 11 * 16][Math.floor(Math.random() * 6)];
+    for (let i = 0; i < INITIAL_CONDITIONS.length / 2; ++i) {
+      if (Math.random() > 0.8) {
+        INITIAL_CONDITIONS[i] = [5 * 16, 6 * 16, 7 * 16, 9 * 16, 10 * 16, 11 * 16][Math.floor(Math.random() * 6)];
+      }
     }
 
     this.buffers = [0, 1].map(() =>
@@ -83,14 +85,10 @@ export class Shader {
   }
 
   pending = false;
-  update(drawNow: boolean = false) {
+  update() {
     this.updateBuffer();
     this.flip = 1 - this.flip;
-    if (drawNow) {
-      this.doNextDraw();
-    } else {
-      this.queueNextDraw();
-    }
+    this.queueNextDraw();
   }
   queueNextDraw() {
     if (!this.pending) {
