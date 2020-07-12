@@ -4,6 +4,9 @@ body,
   height: 100%;
   overflow: hidden;
 }
+.ant-layout-content {
+  position: relative;
+}
 .ant-layout-sider-below {
   position: absolute;
   right: 0;

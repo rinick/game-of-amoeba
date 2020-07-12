@@ -1,5 +1,5 @@
 import regl from 'regl';
-import {mainFrag, viewFrag} from './Frags';
+import {mainFrag, vertFrag, viewFrag} from './Frags';
 
 interface Props {
   buf?: regl.Framebuffer2D;
@@ -9,14 +9,7 @@ interface Props {
 }
 
 const reglBaseObj: regl.DrawConfig = {
-  vert: `
-  precision mediump float;
-  attribute vec2 position;
-  varying vec2 uv;
-  void main() {
-    uv = 0.5 * (position + 1.0);
-    gl_Position = vec4(position, 0, 1);
-  }`,
+  vert: vertFrag,
 
   attributes: {
     position: [-4, -4, 4, -4, 0, 4],
@@ -28,7 +21,9 @@ const reglBaseObj: regl.DrawConfig = {
 };
 
 export class Shader {
-  canvasRegl = regl(this.canvas);
+  canvasGl = this.canvas.getContext('webgl', {preserveDrawingBuffer: true});
+  // canvasGl = this.canvas.getContext('webgl2');
+  canvasRegl = regl(this.canvasGl);
 
   buffers: regl.Framebuffer2D[];
   flip: number = 0;
@@ -58,22 +53,20 @@ export class Shader {
   height: number;
   useVirus: boolean;
   init(width: number, height: number, initData?: regl.TextureImageData, virus = true) {
+    if (this.buffers) {
+      this.buffers[0].destroy();
+      this.buffers[1].destroy();
+    }
+
     this.width = width;
     this.height = height;
     this.useVirus = virus;
-
-    const INITIAL_CONDITIONS = Array(width * height * 4).fill(0);
-    for (let i = 0; i < INITIAL_CONDITIONS.length / 2; ++i) {
-      if (Math.random() > 0.8) {
-        INITIAL_CONDITIONS[i] = [5 * 16, 6 * 16, 7 * 16, 9 * 16, 10 * 16, 11 * 16][Math.floor(Math.random() * 6)];
-      }
-    }
 
     this.buffers = [0, 1].map(() =>
       this.canvasRegl.framebuffer({
         color: this.canvasRegl.texture({
           shape: [width, height, 4],
-          data: INITIAL_CONDITIONS,
+          data: initData,
           mag: 'nearest',
           wrap: 'repeat',
         }),
@@ -93,11 +86,32 @@ export class Shader {
   queueNextDraw() {
     if (!this.pending) {
       this.pending = true;
-      this.canvasRegl.frame(this.doNextDraw);
+      window.requestAnimationFrame(this.doNextDraw);
     }
   }
   doNextDraw = () => {
     this.pending = false;
     this.drawCanvas();
   };
+
+  saveImage() {
+    let blob = this.canvas.toBlob(
+      (blob: Blob) => {
+        let blobUrl = URL.createObjectURL(blob);
+        let aElement = document.createElement('a');
+        aElement.href = blobUrl;
+        aElement.download = 'amoeba.webp';
+        aElement.style.position = 'absolute';
+        aElement.style.opacity = '0';
+        document.body.append(aElement);
+        aElement.click();
+        setTimeout(() => {
+          aElement.remove();
+          URL.revokeObjectURL(blobUrl);
+        }, 2000);
+      },
+      'image/webp',
+      1
+    );
+  }
 }

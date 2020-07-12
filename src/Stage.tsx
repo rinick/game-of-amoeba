@@ -2,18 +2,21 @@ import React from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import classNames from 'classnames';
 import {Shader} from './Shader';
+import {defaultBattle} from './Presets';
 
-interface Props {}
+interface Props {
+  delay: number;
+  useVirus: boolean;
+}
 interface State {
   imgW: number;
   imgH: number;
   canvasScale: 'h' | 'v';
   pixelated: boolean;
-  delay: number;
 }
 
 export class Stage extends React.PureComponent<Props, State> {
-  state: State = {imgW: 64, imgH: 64, canvasScale: 'h', delay: 160, pixelated: true};
+  state: State = {imgW: defaultBattle.width, imgH: defaultBattle.height, canvasScale: 'h', pixelated: true};
   resizeObserver: any;
   shader: Shader;
 
@@ -28,7 +31,7 @@ export class Stage extends React.PureComponent<Props, State> {
       return;
     }
 
-    let {delay} = this.state;
+    let {delay} = this.props;
     if (delay != Infinity) {
       this.timeout = setTimeout(this.updateShader, delay);
     }
@@ -60,12 +63,13 @@ export class Stage extends React.PureComponent<Props, State> {
       this.setState({canvasScale: 'v', pixelated});
     }
   };
-  updateSpeed(delay: number) {
-    this.setState({delay}, this.startTimer);
-  }
   step() {
     this.shader?.update();
   }
+  save() {
+    this.shader?.saveImage();
+  }
+
   mounted = false;
   componentDidMount() {
     let {imgW, imgH, canvasScale, pixelated} = this.state;
@@ -73,11 +77,13 @@ export class Stage extends React.PureComponent<Props, State> {
     this.resizeObserver.observe(this._rootNode);
     this.mounted = true;
     this.shader = new Shader(this._canvasNode);
-    this.shader.init(imgW, imgH);
+    this.shader.init(imgW, imgH, defaultBattle.generator());
     this.startTimer();
   }
 
   render() {
+    this.startTimer();
+
     let {imgW, imgH, canvasScale, pixelated} = this.state;
     let cls = classNames('amoeba-canvas', `canvas-scale-${canvasScale}`, {pixelated: pixelated});
     return (

@@ -10,18 +10,6 @@ import {Stage} from './Stage';
 const {Option} = Select;
 const {Sider, Content} = Layout;
 
-function handleExampleClick(param: ClickParam) {
-  console.log(`menu clicked ${param}`);
-}
-
-const examplesMenu = (
-  <Menu onClick={handleExampleClick}>
-    <Menu.Item key="1">1st menu item</Menu.Item>
-    <Menu.Item key="2">2nd menu item</Menu.Item>
-    <Menu.Item key="3">3rd item</Menu.Item>
-  </Menu>
-);
-
 type SpeedEnum = 'snail' | 'tortoise' | 'hare' | 'cheetah' | 'blue-hedgehog';
 const speedMap = {
   'snail': 2560,
@@ -33,11 +21,12 @@ const speedMap = {
 
 interface State {
   speed: SpeedEnum;
+  useVirus: boolean;
   playing: boolean;
 }
 
 export class App extends React.PureComponent<any, State> {
-  state: State = {speed: 'hare', playing: true};
+  state: State = {speed: 'cheetah', playing: true, useVirus: true};
 
   _stage!: Stage;
   getStageRef = (s: Stage): void => {
@@ -47,29 +36,42 @@ export class App extends React.PureComponent<any, State> {
   onSpeedChange = (speed: SpeedEnum) => {
     let {playing} = this.state;
     this.setState({speed});
-    if (playing) {
-      this._stage?.updateSpeed(speedMap[speed]);
-    }
   };
   onPlay = () => {
     let {speed} = this.state;
     this.setState({playing: true});
-    this._stage?.updateSpeed(speedMap[speed]);
   };
   onPause = () => {
     this.setState({playing: false});
-    this._stage?.updateSpeed(Infinity);
   };
   onStep = () => {
     this._stage?.step();
   };
+  onSave = () => {
+    this._stage?.save();
+  };
+  handleExampleClick(param: ClickParam) {
+    console.log(`menu clicked ${param}`);
+  }
+
+  examplesMenu = (
+    <Menu onClick={this.handleExampleClick}>
+      <Menu.Item key="1">1st menu item</Menu.Item>
+      <Menu.Item key="2">2nd menu item</Menu.Item>
+      <Menu.Item key="3">3rd item</Menu.Item>
+    </Menu>
+  );
 
   render() {
-    let {speed, playing} = this.state;
+    let {speed, playing, useVirus} = this.state;
+    let speedms = Infinity;
+    if (playing) {
+      speedms = speedMap[speed];
+    }
     return (
       <Layout className="stage-layout">
         <Content>
-          <Stage ref={this.getStageRef} />
+          <Stage delay={speedms} useVirus={useVirus} ref={this.getStageRef} />
         </Content>
         <Sider breakpoint="lg" collapsedWidth="0" reverseArrow theme="light">
           <div className="sider">
@@ -99,12 +101,17 @@ export class App extends React.PureComponent<any, State> {
               </Select>
             </div>
             <div className="sider-item">
-              <Dropdown overlay={examplesMenu}>
+              <Dropdown overlay={this.examplesMenu}>
                 <Button>
                   Load Example
                   <DownOutlined />
                 </Button>
               </Dropdown>
+            </div>
+            <div className="sider-item">
+              <Button icon={<CaretRightOutlined />} onClick={this.onSave}>
+                Save
+              </Button>
             </div>
           </div>
         </Sider>
