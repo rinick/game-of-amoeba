@@ -4,8 +4,11 @@ import CaretRightOutlined from '@ant-design/icons/CaretRightOutlined';
 import DownOutlined from '@ant-design/icons/DownOutlined';
 import PauseOutlined from '@ant-design/icons/PauseOutlined';
 import StepForwardOutlined from '@ant-design/icons/StepForwardOutlined';
+import SaveOutlined from '@ant-design/icons/SaveOutlined';
 import {ClickParam} from 'antd/lib/menu';
 import {Stage} from './Stage';
+import {Preset, presets} from './Presets';
+import {t} from './Util';
 
 const {Option} = Select;
 const {Sider, Content} = Layout;
@@ -26,7 +29,7 @@ interface State {
 }
 
 export class App extends React.PureComponent<any, State> {
-  state: State = {speed: 'cheetah', playing: true, useVirus: true};
+  state: State = {speed: 'hare', playing: true, useVirus: true};
 
   _stage!: Stage;
   getStageRef = (s: Stage): void => {
@@ -50,15 +53,17 @@ export class App extends React.PureComponent<any, State> {
   onSave = () => {
     this._stage?.save();
   };
-  handleExampleClick(param: ClickParam) {
-    console.log(`menu clicked ${param}`);
-  }
+  handleExampleClick = (param: ClickParam) => {
+    let preset = presets[param.key];
+    this._stage?.reload(preset);
+  };
 
   examplesMenu = (
     <Menu onClick={this.handleExampleClick}>
-      <Menu.Item key="1">1st menu item</Menu.Item>
-      <Menu.Item key="2">2nd menu item</Menu.Item>
-      <Menu.Item key="3">3rd item</Menu.Item>
+      {Object.keys(presets).map((p) => {
+        let preset = presets[p];
+        return <Menu.Item key={p}>{t(preset.en, preset.zh)}</Menu.Item>;
+      })}
     </Menu>
   );
 
@@ -78,39 +83,38 @@ export class App extends React.PureComponent<any, State> {
             <div className="sider-item">
               {playing ? (
                 <Button type="primary" icon={<PauseOutlined />} onClick={this.onPause}>
-                  Pause
+                  {t('Pause', '暂停')}
                 </Button>
               ) : (
                 <Button type="primary" icon={<CaretRightOutlined />} onClick={this.onPlay}>
-                  Play
+                  {t('Start', '开始')}
                 </Button>
               )}
-
-              <Button icon={<StepForwardOutlined />} disabled={playing} onClick={this.onStep}>
-                Step
+              <Button icon={<StepForwardOutlined />} disabled={speedms < 1000} onClick={this.onStep}>
+                {t('Step', '单步')}
               </Button>
             </div>
             <div className="sider-item">
-              <span>speed:</span>
+              <span>{t('Speed: ', '速度: ')}</span>
               <Select value={speed} style={{width: 120}} onChange={this.onSpeedChange}>
-                <Option value="snail">snail</Option>
-                <Option value="tortoise">tortoise</Option>
-                <Option value="hare">hare</Option>
-                <Option value="cheetah">cheetah</Option>
-                <Option value="blue-hedgehog">blue hedgehog</Option>
+                <Option value="snail"> {t('Snail', '蜗牛')}</Option>
+                <Option value="tortoise"> {t('Tortoise', '乌龟')}</Option>
+                <Option value="hare"> {t('Hare', '野兔')}</Option>
+                <Option value="cheetah"> {t('Cheetah', '猎豹')}</Option>
+                <Option value="blue-hedgehog"> {t('Blue Hedgehog', '蓝刺猬')}</Option>
               </Select>
             </div>
             <div className="sider-item">
-              <Dropdown overlay={this.examplesMenu}>
+              <Dropdown overlay={this.examplesMenu} trigger={['click']}>
                 <Button>
-                  Load Example
+                  {t('Load Example', '读取示例')}
                   <DownOutlined />
                 </Button>
               </Dropdown>
             </div>
             <div className="sider-item">
-              <Button icon={<CaretRightOutlined />} onClick={this.onSave}>
-                Save
+              <Button icon={<SaveOutlined />} onClick={this.onSave}>
+                {t('Save', '保存')}
               </Button>
             </div>
           </div>

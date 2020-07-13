@@ -21,42 +21,54 @@ const reglBaseObj: regl.DrawConfig = {
 };
 
 export class Shader {
-  canvasGl = this.canvas.getContext('webgl', {preserveDrawingBuffer: true});
-  // canvasGl = this.canvas.getContext('webgl2');
-  canvasRegl = regl(this.canvasGl);
+  canvasGl: WebGL2RenderingContext;
+  canvasRegl: regl.Regl;
 
   buffers: regl.Framebuffer2D[];
   flip: number = 0;
 
-  drawCanvas = this.canvasRegl({
-    ...reglBaseObj,
-    frag: viewFrag,
-    uniforms: {
-      buf: () => this.buffers[this.flip],
-    },
-  });
-
-  updateBuffer = this.canvasRegl({
-    ...reglBaseObj,
-    frag: mainFrag,
-    uniforms: {
-      buf: () => this.buffers[this.flip],
-      width: () => this.width,
-      height: () => this.height,
-    },
-    framebuffer: () => this.buffers[1 - this.flip],
-  });
+  drawCanvas: Function;
+  updateBuffer: Function;
 
   constructor(public canvas: HTMLCanvasElement) {}
+
+  destroyRegl() {
+    if (this.buffers) {
+      this.buffers[0].destroy();
+      this.buffers[1].destroy();
+    }
+    this.canvasRegl?.destroy();
+  }
 
   width: number;
   height: number;
   useVirus: boolean;
   init(width: number, height: number, initData?: regl.TextureImageData, virus = true) {
-    if (this.buffers) {
-      this.buffers[0].destroy();
-      this.buffers[1].destroy();
-    }
+    this.destroyRegl();
+    this.canvas.width = width;
+    this.canvas.height = height;
+
+    this.canvasGl = this.canvas.getContext('webgl2', {preserveDrawingBuffer: true});
+    this.canvasRegl = regl(this.canvasGl);
+
+    this.drawCanvas = this.canvasRegl({
+      ...reglBaseObj,
+      frag: viewFrag,
+      uniforms: {
+        buf: () => this.buffers[this.flip],
+      },
+    });
+
+    this.updateBuffer = this.canvasRegl({
+      ...reglBaseObj,
+      frag: mainFrag,
+      uniforms: {
+        buf: () => this.buffers[this.flip],
+        width: () => this.width,
+        height: () => this.height,
+      },
+      framebuffer: () => this.buffers[1 - this.flip],
+    });
 
     this.width = width;
     this.height = height;

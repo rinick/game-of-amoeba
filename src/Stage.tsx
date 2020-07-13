@@ -2,7 +2,7 @@ import React from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import classNames from 'classnames';
 import {Shader} from './Shader';
-import {defaultBattle} from './Presets';
+import {defaultPreset, Preset} from './Presets';
 
 interface Props {
   delay: number;
@@ -11,12 +11,12 @@ interface Props {
 interface State {
   imgW: number;
   imgH: number;
-  canvasScale: 'h' | 'v';
+  canvasScale: 'h' | 'v' | 's';
   pixelated: boolean;
 }
 
 export class Stage extends React.PureComponent<Props, State> {
-  state: State = {imgW: defaultBattle.width, imgH: defaultBattle.height, canvasScale: 'h', pixelated: true};
+  state: State = {imgW: defaultPreset.width, imgH: defaultPreset.height, canvasScale: 'h', pixelated: true};
   resizeObserver: any;
   shader: Shader;
 
@@ -51,17 +51,24 @@ export class Stage extends React.PureComponent<Props, State> {
     this._canvasNode = c;
   };
 
-  handleResize = (entries: ResizeObserverEntry[]) => {
+  checkResize(width: number, height: number) {
     let {imgW, imgH} = this.state;
-    let entry = entries[0];
-    let imgR = imgW / imgH;
-    let stageR = entry.contentRect.width / entry.contentRect.height;
-    let pixelated = entry.contentRect.width > imgW * 1.75 && entry.contentRect.height > imgH * 1.75;
-    if (stageR >= imgR) {
-      this.setState({canvasScale: 'h', pixelated});
+    if (imgW > width || imgH > height) {
+      this.setState({canvasScale: 's', pixelated: true});
     } else {
-      this.setState({canvasScale: 'v', pixelated});
+      let imgR = imgW / imgH;
+      let stageR = width / height;
+      let pixelated = width > imgW * 1.75 && height > imgH * 1.75;
+      if (stageR >= imgR) {
+        this.setState({canvasScale: 'h', pixelated});
+      } else {
+        this.setState({canvasScale: 'v', pixelated});
+      }
     }
+  }
+  handleResize = (entries: ResizeObserverEntry[]) => {
+    let {width, height} = entries[0].contentRect;
+    this.checkResize(width, height);
   };
   step() {
     this.shader?.update();
@@ -69,7 +76,12 @@ export class Stage extends React.PureComponent<Props, State> {
   save() {
     this.shader?.saveImage();
   }
-
+  reload(preset: Preset) {
+    this.setState({imgW: preset.width, imgH: preset.height}, () => {
+      this.checkResize(this._canvasNode.offsetWidth, this._canvasNode.offsetHeight);
+    });
+    this.shader?.init(preset.width, preset.height, preset.generator());
+  }
   mounted = false;
   componentDidMount() {
     let {imgW, imgH, canvasScale, pixelated} = this.state;
@@ -77,7 +89,7 @@ export class Stage extends React.PureComponent<Props, State> {
     this.resizeObserver.observe(this._rootNode);
     this.mounted = true;
     this.shader = new Shader(this._canvasNode);
-    this.shader.init(imgW, imgH, defaultBattle.generator());
+    this.shader.init(imgW, imgH, defaultPreset.generator());
     this.startTimer();
   }
 
