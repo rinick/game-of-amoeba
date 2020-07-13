@@ -25,9 +25,18 @@
     "cross-env": "^7.0.2",
     "lodash": "^4.17.15",
     "parcel-bundler": "^1.12.4",
+    "parcel-plugin-static-files-copy": "^2.4.3",
     "prettier": "^2.0.4",
     "regl": "^1.6.1",
     "resize-observer-polyfill": "^1.5.1",
     "typescript": "^3.9.6"
+  },
+  "staticFiles": {
+    "staticPath": [
+      {
+        "staticPath": "presets",
+        "staticOutDir": "presets"
+      }
+    ]
   }
 }

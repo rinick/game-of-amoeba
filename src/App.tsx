@@ -57,8 +57,11 @@ export class App extends React.PureComponent<any, State> {
   onSave = () => {
     this._stage?.save();
   };
-  handleExampleClick = (param: ClickParam) => {
+  handleExampleClick = async (param: ClickParam) => {
     let preset = presets[param.key];
+    if (preset.load) {
+      await preset.load();
+    }
     this._stage?.reload(preset);
   };
 

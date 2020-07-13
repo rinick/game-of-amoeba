@@ -6,6 +6,7 @@ export interface Preset {
   useVirus: boolean;
 
   generator: () => number[];
+  load?: () => Promise<any>;
 }
 
 function randomInit(option: number[]) {
@@ -82,6 +83,75 @@ function genSolo(size: number): Preset {
     },
   };
 }
+/*
+hhh
+src.f69400ca.js:74547 hbb
+src.f69400ca.js:74547 901
+src.f69400ca.js:74547 e12
+src.f69400ca.js:74547 aeh
+src.f69400ca.js:74547 17e
+src.f69400ca.js:74547 049
+ */
+
+const colorToValue: {[key: string]: number} = {
+  'hhh': 255,
+  '049': 5 * 16,
+  '17e': 6 * 16,
+  'aeh': 7 * 16,
+  '901': 9 * 16,
+  'e12': 10 * 16,
+  'hbb': 11 * 16,
+};
+
+function imageDataToBufferData(imageData: ImageData): number[] {
+  const data = Array(imageData.width * imageData.height * 4).fill(0);
+  let pixels = imageData.data;
+  let set = new Set<string>();
+  let {width, height} = imageData;
+  for (let j = 0; j < height; ++j)
+    for (let i = 0; i < width; ++i) {
+      let p = (j * width + i) * 4;
+      let s = `${Math.round(pixels[p] / 15).toString(18)}${Math.round(pixels[p + 1] / 15).toString(18)}${Math.round(
+        pixels[p + 2] / 15
+      ).toString(18)}`;
+      if (colorToValue.hasOwnProperty(s)) {
+        data[((height - j - 1) * width + i) * 4] = colorToValue[s];
+      }
+    }
+  return data;
+}
+
+class LoadImage implements Preset {
+  width: number;
+  height: number;
+  useVirus = true;
+  data: number[];
+  generator() {
+    return this.data;
+  }
+  constructor(public en: string, public zh?: string) {
+    if (!zh) {
+      this.zh = en;
+    }
+  }
+  load() {
+    return new Promise<any>((rsolve) => {
+      let img = new Image();
+      img.onload = () => {
+        var canvas = document.createElement('canvas');
+        this.width = canvas.width = img.width;
+        this.height = canvas.height = img.height;
+
+        var context = canvas.getContext('2d');
+        context.drawImage(img, 0, 0);
+        this.data = imageDataToBufferData(context.getImageData(0, 0, img.width, img.height));
+        rsolve();
+      };
+      img.src = `./presets/${this.en}.webp`;
+    });
+  }
+}
+
 export const presets: {[key: string]: Preset} = {
   battle128: genBattle(128),
   battle256: genBattle(256),
@@ -90,5 +160,6 @@ export const presets: {[key: string]: Preset} = {
   solo128: genSolo(128),
   solo256: genSolo(256),
   solo512: genSolo(512),
+  test: new LoadImage('test'),
 };
 export const defaultPreset = presets.battle128;
