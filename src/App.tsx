@@ -1,5 +1,9 @@
-import React, {useRef} from 'react';
-import {Select, Button, Dropdown, Menu, Layout} from 'antd';
+import React from 'react';
+import Button from 'antd/lib/button';
+import Select from 'antd/lib/select';
+import Dropdown from 'antd/lib/dropdown';
+import Menu from 'antd/lib/menu';
+import Layout from 'antd/lib/layout';
 import CaretRightOutlined from '@ant-design/icons/CaretRightOutlined';
 import DownOutlined from '@ant-design/icons/DownOutlined';
 import PauseOutlined from '@ant-design/icons/PauseOutlined';
