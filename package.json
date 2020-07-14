@@ -37,6 +37,7 @@
         "staticPath": "presets",
         "staticOutDir": "presets"
       }
-    ]
+    ],
+    "watcherGlob": "**/*.webp"
   }
 }

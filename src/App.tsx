@@ -33,7 +33,7 @@ interface State {
 }
 
 export class App extends React.PureComponent<any, State> {
-  state: State = {speed: 'hare', playing: true, useVirus: true};
+  state: State = {speed: 'cheetah', playing: true, useVirus: true};
 
   _stage!: Stage;
   getStageRef = (s: Stage): void => {

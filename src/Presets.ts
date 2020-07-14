@@ -162,4 +162,4 @@ export const presets: {[key: string]: Preset} = {
   solo512: genSolo(512),
   test: new LoadImage('test'),
 };
-export const defaultPreset = presets.battle128;
+export const defaultPreset = presets.test;

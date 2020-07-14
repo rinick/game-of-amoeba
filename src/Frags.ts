@@ -32,7 +32,7 @@ ivec2 vLqs = ivec2(0,0); // liquid
 ivec2 vLifs = ivec2(0,0); // core 
 ivec2 vWas = ivec2(0,0); // wall 
 int vVirus = 0;
-
+int vBlocker = 0;
 
 void countP(vec2 pt){
   vec4 c = texture2D(buf, pt);
@@ -55,6 +55,8 @@ void countP(vec2 pt){
     vLifs[1] = vLifs[1] + 1;
   } else if (v  < 11.5) {
     vWas[1] = vWas[1] + 1;
+  } else if (v > 15.5) {
+    vBlocker = vBlocker +1;
   }
 }
 void main(void) {
@@ -109,7 +111,7 @@ void main(void) {
      } else {
        rslt = 0.0;
      } 
-   } else if (vVirus > 0 && ( type == 2 || type == 3 || type == 1
+   } else if (vVirus > 0 && ( type > 0
               //  || (v == 0 && vVirus == 3 && vWa > 0)
              )) {
      rslt = nVirus;      // virus spread
@@ -121,13 +123,15 @@ void main(void) {
         rslt = nLif1;
       }
     } else if (type == 1) {
-      if (vLif > 3 || vLifOther > 1 || vWaOther > 0 || vLqMe == 0) {      // liquid may be consumed
+      if (vLif > 3 || vLifOther > 1 || vWaOther > 0 || vLqMe == 0 ) { // liquid may be consumed
+        rslt = 0.0;
+      } else if (vLif > 0 && vLif + vBlocker == 5 && vLq == 2) { // special rule to prevent dead loop at corner 
         rslt = 0.0;
       } else {
         rslt = old[0];
       }
     } else {
-      if (vLq == 0) {
+      if (vLq == 0 || (vBlocker > 2 && vLif == 0)) {
         rslt = 0.0;
       } else {
         if (vLif == 0) {      // try building wall
