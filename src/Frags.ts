@@ -131,7 +131,7 @@ void main(void) {
         rslt = old[0];
       }
     } else {
-      if (vLq == 0 || (vBlocker > 2 && vLif == 0)) {
+      if (vLq == 0 || (vBlocker > 0 && vLif == 0)) {
         rslt = 0.0;
       } else {
         if (vLif == 0) {      // try building wall
