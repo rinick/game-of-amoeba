@@ -123,7 +123,7 @@ void main(void) {
         rslt = nLif1;
       }
     } else if (type == 1) {
-      if (vLif > 3 || vLifOther > 1 || vWaOther > 0 || vLqMe == 0 ) { // liquid may be consumed
+      if (vLif > 3 || vLifOther > 1 || vWaOther > 0 || vLqMe == 0) { // liquid may be consumed
         rslt = 0.0;
       } else if (vLif > 0 && vLif + vBlocker == 5 && vLq == 2) { // special rule to prevent dead loop at corner 
         rslt = 0.0;
@@ -131,7 +131,7 @@ void main(void) {
         rslt = old[0];
       }
     } else {
-      if (vLq == 0 || (vBlocker > 0 && vLif == 0)) {
+      if (vLq == 0) {
         rslt = 0.0;
       } else {
         if (vLif == 0) {      // try building wall
@@ -148,7 +148,7 @@ void main(void) {
               rslt = nWa1;
             }
           }
-          if (rslt != 0.0) {
+          if (rslt != 0.0 || vBlocker > 0) {
             gl_FragColor = vec4(rslt,old.rgb);
             return;
           }
