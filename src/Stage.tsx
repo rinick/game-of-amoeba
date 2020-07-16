@@ -36,8 +36,18 @@ export class Stage extends React.PureComponent<Props, State> {
       this.timeout = setTimeout(this.updateShader, delay);
     }
   };
+
   updateShader = () => {
-    this.shader?.update();
+    if (this.shader) {
+      let startTime = window.performance.now();
+      this.shader.update();
+      let {delay} = this.props;
+      if (delay === 0) {
+        for (let i = 0; i < 16; ++i) {
+          this.shader?.update();
+        }
+      }
+    }
     this.startTimer();
   };
 

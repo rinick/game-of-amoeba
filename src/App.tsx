@@ -23,6 +23,7 @@ const speedMap = {
   'tortoise': 640,
   'hare': 160,
   'cheetah': 40,
+  'falcon': 1,
   'blue-hedgehog': 0,
 };
 
@@ -108,6 +109,7 @@ export class App extends React.PureComponent<any, State> {
                 <Option value="tortoise"> {t('Tortoise', '乌龟')}</Option>
                 <Option value="hare"> {t('Hare', '野兔')}</Option>
                 <Option value="cheetah"> {t('Cheetah', '猎豹')}</Option>
+                <Option value="falcon"> {t('Falcon', '游隼')}</Option>
                 <Option value="blue-hedgehog"> {t('Blue Hedgehog', '蓝刺猬')}</Option>
               </Select>
             </div>
