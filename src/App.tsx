@@ -95,7 +95,7 @@ export class App extends React.PureComponent<any, State> {
         <Content>
           <Stage delay={speedms} useVirus={useVirus} ref={this.getStageRef} />
         </Content>
-        <Sider breakpoint="lg" collapsedWidth="0" reverseArrow theme="light">
+        <Sider breakpoint="lg" collapsedWidth="0" reverseArrow theme="light" width={300}>
           <div className="sider">
             <div className="sider-item">
               {playing ? (
@@ -112,7 +112,7 @@ export class App extends React.PureComponent<any, State> {
               </Button>
             </div>
             <div className="sider-item">
-              <span>{t('Speed: ', '速度: ')}</span>
+              <span className="sider-label">{t('Speed: ', '速度: ')}</span>
               <Select value={speed} style={{width: 120}} onChange={this.onSpeedChange}>
                 <Option value="snail"> {t('Snail', '蜗牛')}</Option>
                 <Option value="tortoise"> {t('Tortoise', '乌龟')}</Option>
@@ -138,6 +138,8 @@ export class App extends React.PureComponent<any, State> {
                 <Button icon={<UploadOutlined />}>{t('Load', '加载')}</Button>
               </Upload>
             </div>
+            <div className="sider-spacer" />
+            <div className="sider-last" />
           </div>
         </Sider>
       </Layout>
