@@ -2,16 +2,19 @@ import React from 'react';
 import Button from 'antd/lib/button';
 import Select from 'antd/lib/select';
 import Dropdown from 'antd/lib/dropdown';
-import Menu from 'antd/lib/menu';
+import Menu, {ClickParam} from 'antd/lib/menu';
 import Layout from 'antd/lib/layout';
+import Upload from 'antd/lib/upload';
+import {RcFile} from 'antd/lib/upload/interface';
 import CaretRightOutlined from '@ant-design/icons/CaretRightOutlined';
 import DownOutlined from '@ant-design/icons/DownOutlined';
 import PauseOutlined from '@ant-design/icons/PauseOutlined';
 import StepForwardOutlined from '@ant-design/icons/StepForwardOutlined';
 import SaveOutlined from '@ant-design/icons/SaveOutlined';
-import {ClickParam} from 'antd/lib/menu';
+import UploadOutlined from '@ant-design/icons/UploadOutlined';
+
 import {Stage} from './Stage';
-import {Preset, presets} from './Presets';
+import {LoadImage, Preset, presets} from './Presets';
 import {t} from './Util';
 
 const {Option} = Select;
@@ -58,6 +61,12 @@ export class App extends React.PureComponent<any, State> {
   onSave = () => {
     this._stage?.save();
   };
+  onLoad = (file: RcFile) => {
+    let loadImage = new LoadImage(null, null, file);
+    loadImage.load().then(() => this._stage?.reload(loadImage));
+    return false;
+  };
+
   handleExampleClick = async (param: ClickParam) => {
     let preset = presets[param.key];
     if (preset.load) {
@@ -125,6 +134,9 @@ export class App extends React.PureComponent<any, State> {
               <Button icon={<SaveOutlined />} onClick={this.onSave}>
                 {t('Save', '保存')}
               </Button>
+              <Upload accept=".webp" showUploadList={false} beforeUpload={this.onLoad}>
+                <Button icon={<UploadOutlined />}>{t('Load', '加载')}</Button>
+              </Upload>
             </div>
           </div>
         </Sider>

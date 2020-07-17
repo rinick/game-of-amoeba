@@ -95,6 +95,7 @@ src.f69400ca.js:74547 049
 
 const colorToValue: {[key: string]: number} = {
   'hhh': 255,
+  'h0h': 4 * 16,
   '049': 5 * 16,
   '17e': 6 * 16,
   'aeh': 7 * 16,
@@ -121,15 +122,16 @@ function imageDataToBufferData(imageData: ImageData): number[] {
   return data;
 }
 
-class LoadImage implements Preset {
+export class LoadImage implements Preset {
   width: number;
   height: number;
   useVirus = true;
   data: number[];
+
   generator() {
     return this.data;
   }
-  constructor(public en: string, public zh?: string) {
+  constructor(public en: string, public zh?: string, public imgFile?: Blob) {
     if (!zh) {
       this.zh = en;
     }
@@ -137,6 +139,12 @@ class LoadImage implements Preset {
   load() {
     return new Promise<any>((rsolve) => {
       let img = new Image();
+      let url: string;
+      if (this.imgFile) {
+        url = URL.createObjectURL(this.imgFile);
+      } else {
+        url = `./presets/${this.en}.webp`;
+      }
       img.onload = () => {
         var canvas = document.createElement('canvas');
         this.width = canvas.width = img.width;
@@ -145,9 +153,12 @@ class LoadImage implements Preset {
         var context = canvas.getContext('2d');
         context.drawImage(img, 0, 0);
         this.data = imageDataToBufferData(context.getImageData(0, 0, img.width, img.height));
+        if (url.startsWith('blob:')) {
+          URL.revokeObjectURL(url);
+        }
         rsolve();
       };
-      img.src = `./presets/${this.en}.webp`;
+      img.src = url;
     });
   }
 }

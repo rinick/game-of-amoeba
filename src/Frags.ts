@@ -106,14 +106,12 @@ void main(void) {
    }
 
    if (v == 4) {
-     if ( vWa > 0 && vVirus > 2) {      // use > 2 to adjust virus's scale
+     if (vBlocker > 2 || vVirus > 4 || (vWa+vLq+vLif > 0 && vVirus > 1)) {
        rslt = nVirus;
      } else {
        rslt = 0.0;
      } 
-   } else if (vVirus > 0 && ( type > 0
-              //  || (v == 0 && vVirus == 3 && vWa > 0)
-             )) {
+   } else if ( vVirus > 0 && vBlocker < 3 && type > 0) {
      rslt = nVirus;      // virus spread
    } else if (type <= 1){
     if (vLif == 3) {      // life grows at 3 neighbors, even when one of them is enemy
