@@ -171,6 +171,6 @@ export const presets: {[key: string]: Preset} = {
   solo128: genSolo(128),
   solo256: genSolo(256),
   solo512: genSolo(512),
-  test: new LoadImage('test'),
+  circuit: new LoadImage('Circuit Emulation', '电路模拟'),
 };
-export const defaultPreset = presets.test;
+export const defaultPreset = presets.circuit;

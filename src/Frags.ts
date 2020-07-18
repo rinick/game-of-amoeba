@@ -191,12 +191,16 @@ function hex2vec4(c: string) {
   let r = (parseInt(c.substr(1, 2), 16) / 255).toFixed(2);
   let g = (parseInt(c.substr(3, 2), 16) / 255).toFixed(2);
   let b = (parseInt(c.substr(5, 2), 16) / 255).toFixed(2);
-  return `vec4(${r},${g},${b},1.0);`;
+  return `vec4(${r},${g},${b},1.0)`;
 }
 
 export const viewFrag = `precision mediump float;
 uniform sampler2D buf;
+uniform float width, height, mouseX, mouseY, drawSize;
 varying vec2 uv;
+float dx= 1./width , dy= 1./height ;
+float outerSize = drawSize + 0.5;
+float innerSize = drawSize - 0.5;
 void main() {
   vec4 old = texture2D(buf, uv);
   int v =  int(old[0]*16.0 + 0.5);
@@ -219,5 +223,55 @@ void main() {
   } else {
     gl_FragColor = ${hex2vec4('#000000')};
   }
+  if (drawSize > 0.0) {
+    float dx = abs(uv.x - mouseX) * width;
+    float dy = abs(uv.y - mouseY) * height;
+    if ( dx <= outerSize && dy <= outerSize && (dy > innerSize || dx > innerSize)) {
+      gl_FragColor = mix(gl_FragColor, ${hex2vec4('#00ff00')}, 0.5) ;
+      return;
+    }
+  }
+}
+`;
+
+export const drawPixelsFrag = `precision mediump float;
+uniform sampler2D buf;
+uniform float width, height, mouseX, mouseY, drawSize, drawType;
+varying vec2 uv;
+const float baseBlue = ${4 / 16};
+const float baseRed = ${8 / 16};
+
+float dx= 1./width , dy= 1./height ;
+float innerSize = drawSize - 0.5;
+float random (vec2 st) {
+    return fract(sin(dot(st.xy,vec2(12.9898,78.233))*drawType)*43758.5453123);
+}
+void main() {
+  vec4 old = texture2D(buf, uv);
+  if (drawSize > 0.0) {
+    float dx = abs(uv.x - mouseX) * width;
+    float dy = abs(uv.y - mouseY) * height;
+    if (dy <= innerSize && dx <= innerSize) {
+      float v;
+      if (drawType > 27.0) {
+        // random red
+        v = floor(random(uv) * 4.0);
+        if (v > 0.0) {
+          v = v / 16.0 + baseRed;
+        }
+      } else if (drawType > 17.0) {
+        // random blue
+        v = floor(random(uv) * 4.0);
+        if (v > 0.0) {
+          v = v / 16.0 + baseBlue;
+        }
+      } else {
+          v = drawType / 16.0;
+      }
+      gl_FragColor = vec4(v, old.rgb);
+      return;
+    }
+  }
+  gl_FragColor = old;
 }
 `;

@@ -6,7 +6,9 @@ import {defaultPreset, Preset} from './Presets';
 
 interface Props {
   delay: number;
-  useVirus: boolean;
+  scale: number;
+  drawSize: number;
+  drawType: number;
 }
 interface State {
   imgW: number;
@@ -62,8 +64,9 @@ export class Stage extends React.PureComponent<Props, State> {
   };
 
   checkResize(width: number, height: number) {
+    let {scale} = this.props;
     let {imgW, imgH} = this.state;
-    if (imgW > width || imgH > height) {
+    if (scale || imgW > width || imgH > height) {
       this.setState({canvasScale: 's', pixelated: true});
     } else {
       let imgR = imgW / imgH;
@@ -80,6 +83,9 @@ export class Stage extends React.PureComponent<Props, State> {
     let {width, height} = entries[0].contentRect;
     this.checkResize(width, height);
   };
+  forceResize() {
+    this.checkResize(this._rootNode.offsetWidth, this._rootNode.offsetHeight);
+  }
   step() {
     this.shader?.update();
   }
@@ -88,12 +94,13 @@ export class Stage extends React.PureComponent<Props, State> {
   }
   reload(preset: Preset) {
     this.setState({imgW: preset.width, imgH: preset.height}, () => {
-      this.checkResize(this._canvasNode.offsetWidth, this._canvasNode.offsetHeight);
+      this.forceResize();
     });
     this.shader?.init(preset.width, preset.height, preset.generator());
   }
   mounted = false;
   componentDidMount() {
+    let {drawSize} = this.props;
     let {imgW, imgH, canvasScale, pixelated} = this.state;
     this.resizeObserver = new ResizeObserver(this.handleResize);
     this.resizeObserver.observe(this._rootNode);
@@ -101,16 +108,46 @@ export class Stage extends React.PureComponent<Props, State> {
     this.shader = new Shader(this._canvasNode);
     this.shader.init(imgW, imgH, defaultPreset.generator());
     this.startTimer();
+    this.shader?.updateDrawSize(drawSize);
   }
 
-  render() {
-    this.startTimer();
+  onMouseMove = (e: React.MouseEvent) => {
+    if (e.buttons === 1) {
+      let {drawType} = this.props;
+      this.shader.addPixels(drawType);
+    }
+    this.shader?.mouseMove(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+  };
+  onMouseLeave = () => {
+    this.shader?.mouseMove();
+  };
 
+  render() {
+    let {scale, drawSize} = this.props;
     let {imgW, imgH, canvasScale, pixelated} = this.state;
-    let cls = classNames('amoeba-canvas', `canvas-scale-${canvasScale}`, {pixelated: pixelated});
+
+    let style: any = null;
+    if (scale) {
+      style = {width: imgW * scale, height: imgH * scale};
+    }
+
+    this.startTimer();
+    this.shader?.updateDrawSize(drawSize);
+
+    let stageCls = classNames('amoeba-stage', `stage-scale-${canvasScale}`);
+    let canvasCls = classNames('amoeba-canvas', `canvas-scale-${canvasScale}`, {pixelated: pixelated});
     return (
-      <div className="content-stage" ref={this.getRootRef}>
-        <canvas className={cls} ref={this.getCanvasRef} width={imgW} height={imgH} />
+      <div className={stageCls} ref={this.getRootRef}>
+        <canvas
+          className={canvasCls}
+          ref={this.getCanvasRef}
+          width={imgW}
+          height={imgH}
+          style={style}
+          onMouseDown={drawSize ? this.onMouseMove : null}
+          onMouseMove={drawSize ? this.onMouseMove : null}
+          onMouseLeave={drawSize ? this.onMouseLeave : null}
+        />
       </div>
     );
   }
