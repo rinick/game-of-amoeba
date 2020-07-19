@@ -52,7 +52,7 @@ function genBattle(size: number): Preset {
       const data = Array(size * size * 4).fill(0);
 
       let half = size / 2;
-      let r = size / 8 + 16;
+      let r = size / 16 + 16;
       fillRoundBuffer(data, size, [0, 5, 6, 7], half + 1 - r, half + 1 - r, r);
       fillRoundBuffer(data, size, [0, 9, 10, 11], half - 2 + r, half - 2 + r, r);
 
@@ -173,4 +173,4 @@ export const presets: {[key: string]: Preset} = {
   solo512: genSolo(512),
   circuit: new LoadImage('Circuit Emulation', '电路模拟'),
 };
-export const defaultPreset = presets.circuit;
+export const defaultPreset = presets.battle128;

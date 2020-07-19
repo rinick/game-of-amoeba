@@ -6,6 +6,6 @@ import {defaultPreset} from './Presets';
 
 initLan();
 (async () => {
-  await defaultPreset.load();
+  await defaultPreset.load?.();
   ReactDOM.render(<App />, document.querySelector('#app'));
 })();

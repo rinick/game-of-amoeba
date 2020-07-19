@@ -106,7 +106,7 @@ void main(void) {
    }
 
    if (v == 4) {
-     if (vBlocker > 2 || vVirus > 4 || (vWa+vLq+vLif > 0 && vVirus > 1)) {
+     if (vBlocker > 3 || vVirus > 4 || (vWa+vLq+vLif > 0 && vVirus - vBlocker > 1)) {
        rslt = nVirus;
      } else {
        rslt = 0.0;
