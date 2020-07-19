@@ -130,6 +130,7 @@ canvas.pixelated {
 .color-btn {
   border: solid 1px #aaa;
   flex: 0 0 auto;
+  cursor: pointer;
 }
 
 .color-btn-color {

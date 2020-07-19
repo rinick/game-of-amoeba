@@ -21,17 +21,37 @@ export function initLan() {
     } else {
       isEN = true;
     }
-  } else{
-    isEN = true
+  } else {
+    isEN = true;
   }
 
   if (isEN) {
-    document.title = 'Game of Amoebae';
+    document.title = "Rick's Game of Amoebae";
   } else {
-    document.title = '变形虫游戏';
+    document.title = '变形虫自动机';
   }
 }
 
 export function t(en: string, zh: string): string {
   return isEN ? en : zh;
+}
+
+export function extractName(str: string) {
+  let parts = str.split(/[ .-]/g);
+  for (let part of parts) {
+    if (part && part !== 'amoeba' && part !== 'amoebae' && part !== 'webp' && !part.match(/^\d{12}$/)) {
+      return part;
+    }
+  }
+  return '';
+}
+
+function to2(n: number) {
+  return n.toString().padStart(2, '0');
+}
+export function getDateString() {
+  let date = new Date();
+  return `${date.getFullYear()}${to2(date.getMonth() + 1)}${to2(date.getDate())}${to2(date.getHours())}${to2(
+    date.getMinutes()
+  )}`;
 }

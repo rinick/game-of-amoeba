@@ -83,15 +83,6 @@ function genSolo(size: number): Preset {
     },
   };
 }
-/*
-hhh
-src.f69400ca.js:74547 hbb
-src.f69400ca.js:74547 901
-src.f69400ca.js:74547 e12
-src.f69400ca.js:74547 aeh
-src.f69400ca.js:74547 17e
-src.f69400ca.js:74547 049
- */
 
 const colorToValue: {[key: string]: number} = {
   'hhh': 255,
@@ -173,4 +164,5 @@ export const presets: {[key: string]: Preset} = {
   solo512: genSolo(512),
   circuit: new LoadImage('Circuit Emulation', '电路模拟'),
 };
-export const defaultPreset = presets.battle128;
+export const defaultName: string = 'battle128';
+export const defaultPreset = presets[defaultName];

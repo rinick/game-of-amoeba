@@ -1,5 +1,7 @@
 import regl from 'regl';
 import {drawPixelsFrag, mainFrag, vertFrag, viewFrag} from './Frags';
+import {defaultName} from './Presets';
+import {getDateString} from './Util';
 
 interface Props {
   buf?: regl.Framebuffer2D;
@@ -21,6 +23,7 @@ const reglBaseObj: regl.DrawConfig = {
 };
 
 export class Shader {
+  static fileName = defaultName;
   canvasGl: WebGL2RenderingContext;
   canvasRegl: regl.Regl;
 
@@ -159,7 +162,7 @@ export class Shader {
         let blobUrl = URL.createObjectURL(blob);
         let aElement = document.createElement('a');
         aElement.href = blobUrl;
-        aElement.download = 'amoeba.webp';
+        aElement.download = `amoebae-${Shader.fileName}-${getDateString()}.webp`;
         aElement.style.position = 'absolute';
         aElement.style.opacity = '0';
         document.body.append(aElement);

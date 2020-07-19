@@ -16,9 +16,10 @@ import UploadOutlined from '@ant-design/icons/UploadOutlined';
 
 import {Stage} from './Stage';
 import {LoadImage, Preset, presets} from './Presets';
-import {t} from './Util';
+import {extractName, t} from './Util';
 import {RadioChangeEvent} from 'antd/lib/radio/interface';
 import {ColorButton} from './ColorButton';
+import {Shader} from './Shader';
 
 const {Option} = Select;
 const {Sider, Content} = Layout;
@@ -42,7 +43,7 @@ interface State {
 }
 
 export class App extends React.PureComponent<any, State> {
-  state: State = {speed: 'hare', playing: true, scale: 0, drawSize: 0, drawType: 20};
+  state: State = {speed: 'hare', playing: true, scale: 0, drawSize: 0, drawType: 5};
 
   _stage!: Stage;
   getStageRef = (s: Stage): void => {
@@ -80,6 +81,7 @@ export class App extends React.PureComponent<any, State> {
   onLoad = (file: RcFile) => {
     let loadImage = new LoadImage(null, null, file);
     loadImage.load().then(() => this._stage?.reload(loadImage));
+    Shader.fileName = extractName(file.name);
     return false;
   };
 
@@ -89,6 +91,7 @@ export class App extends React.PureComponent<any, State> {
       await preset.load();
     }
     this._stage?.reload(preset);
+    Shader.fileName = param.key;
   };
 
   examplesMenu = (
@@ -206,6 +209,15 @@ export class App extends React.PureComponent<any, State> {
             </div>
             {drawSize > 0 ? (
               <div className="color-bar">
+                <ColorButton value={0} color="#000" selected={drawType} setValue={this.onDrawTypeChange} />
+                <ColorButton value={5} color="#003a8c" selected={drawType} setValue={this.onDrawTypeChange} />
+                <ColorButton value={6} color="#096dd9" selected={drawType} setValue={this.onDrawTypeChange} />
+                <ColorButton value={7} color="#91d5ff" selected={drawType} setValue={this.onDrawTypeChange} />
+                <ColorButton value={9} color="#820014" selected={drawType} setValue={this.onDrawTypeChange} />
+                <ColorButton value={10} color="#cf1322" selected={drawType} setValue={this.onDrawTypeChange} />
+                <ColorButton value={11} color="#ffa39e" selected={drawType} setValue={this.onDrawTypeChange} />
+                <ColorButton value={16} color="#fff" selected={drawType} setValue={this.onDrawTypeChange} />
+                <ColorButton value={4} color="#ff00ff" selected={drawType} setValue={this.onDrawTypeChange} />
                 <ColorButton
                   value={20}
                   color="linear-gradient(135deg, #003a8c 0%, #096dd9 50%, #91d5ff 100%)"
@@ -218,15 +230,6 @@ export class App extends React.PureComponent<any, State> {
                   selected={drawType}
                   setValue={this.onDrawTypeChange}
                 />
-                <ColorButton value={0} color="#000" selected={drawType} setValue={this.onDrawTypeChange} />
-                <ColorButton value={5} color="#003a8c" selected={drawType} setValue={this.onDrawTypeChange} />
-                <ColorButton value={6} color="#096dd9" selected={drawType} setValue={this.onDrawTypeChange} />
-                <ColorButton value={7} color="#91d5ff" selected={drawType} setValue={this.onDrawTypeChange} />
-                <ColorButton value={9} color="#820014" selected={drawType} setValue={this.onDrawTypeChange} />
-                <ColorButton value={10} color="#cf1322" selected={drawType} setValue={this.onDrawTypeChange} />
-                <ColorButton value={11} color="#ffa39e" selected={drawType} setValue={this.onDrawTypeChange} />
-                <ColorButton value={16} color="#fff" selected={drawType} setValue={this.onDrawTypeChange} />
-                <ColorButton value={4} color="#ff00ff" selected={drawType} setValue={this.onDrawTypeChange} />
               </div>
             ) : null}
             <div className="sider-spacer" />
