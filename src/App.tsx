@@ -209,24 +209,80 @@ export class App extends React.PureComponent<any, State> {
             </div>
             {drawSize > 0 ? (
               <div className="color-bar">
-                <ColorButton value={0} color="#000" selected={drawType} setValue={this.onDrawTypeChange} />
-                <ColorButton value={5} color="#003a8c" selected={drawType} setValue={this.onDrawTypeChange} />
-                <ColorButton value={6} color="#096dd9" selected={drawType} setValue={this.onDrawTypeChange} />
-                <ColorButton value={7} color="#91d5ff" selected={drawType} setValue={this.onDrawTypeChange} />
-                <ColorButton value={9} color="#820014" selected={drawType} setValue={this.onDrawTypeChange} />
-                <ColorButton value={10} color="#cf1322" selected={drawType} setValue={this.onDrawTypeChange} />
-                <ColorButton value={11} color="#ffa39e" selected={drawType} setValue={this.onDrawTypeChange} />
-                <ColorButton value={16} color="#fff" selected={drawType} setValue={this.onDrawTypeChange} />
-                <ColorButton value={4} color="#ff00ff" selected={drawType} setValue={this.onDrawTypeChange} />
+                <ColorButton
+                  value={0}
+                  color="#000"
+                  title={t('Empty', '空白')}
+                  selected={drawType}
+                  setValue={this.onDrawTypeChange}
+                />
+                <ColorButton
+                  value={5}
+                  color="#003a8c"
+                  title={t('Plasm', '细胞质')}
+                  selected={drawType}
+                  setValue={this.onDrawTypeChange}
+                />
+                <ColorButton
+                  value={6}
+                  color="#096dd9"
+                  title={t('Core', '核心')}
+                  selected={drawType}
+                  setValue={this.onDrawTypeChange}
+                />
+                <ColorButton
+                  value={7}
+                  color="#91d5ff"
+                  title={t('Membrane', '细胞膜')}
+                  selected={drawType}
+                  setValue={this.onDrawTypeChange}
+                />
                 <ColorButton
                   value={20}
-                  color="linear-gradient(135deg, #003a8c 0%, #096dd9 50%, #91d5ff 100%)"
+                  color="linear-gradient(135deg, #003a8c 25%, #096dd9 50%, #91d5ff 75%)"
+                  title={t('Random Blue', '随机蓝色')}
+                  selected={drawType}
+                  setValue={this.onDrawTypeChange}
+                />
+                <ColorButton
+                  value={9}
+                  color="#820014"
+                  title={t('Plasm', '细胞质')}
+                  selected={drawType}
+                  setValue={this.onDrawTypeChange}
+                />
+                <ColorButton
+                  value={10}
+                  color="#cf1322"
+                  title={t('Core', '核心')}
+                  selected={drawType}
+                  setValue={this.onDrawTypeChange}
+                />
+                <ColorButton
+                  value={11}
+                  color="#ffa39e"
+                  title={t('Membrane', '细胞膜')}
                   selected={drawType}
                   setValue={this.onDrawTypeChange}
                 />
                 <ColorButton
                   value={30}
-                  color="linear-gradient(135deg, #820014 0%, #cf1322 50%, #ffa39e 100%)"
+                  color="linear-gradient(135deg, #820014 25%, #cf1322 50%, #ffa39e 75%)"
+                  title={t('Random Red', '随机红色')}
+                  selected={drawType}
+                  setValue={this.onDrawTypeChange}
+                />
+                <ColorButton
+                  value={16}
+                  color="#fff"
+                  title={t('Wall', '墙')}
+                  selected={drawType}
+                  setValue={this.onDrawTypeChange}
+                />
+                <ColorButton
+                  value={4}
+                  color="#ff00ff"
+                  title={t('Virus', '病毒')}
                   selected={drawType}
                   setValue={this.onDrawTypeChange}
                 />

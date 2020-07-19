@@ -162,7 +162,7 @@ export class Shader {
         let blobUrl = URL.createObjectURL(blob);
         let aElement = document.createElement('a');
         aElement.href = blobUrl;
-        aElement.download = `amoebae-${Shader.fileName}-${getDateString()}.webp`;
+        aElement.download = `amoeba-${Shader.fileName}-${getDateString()}.webp`;
         aElement.style.position = 'absolute';
         aElement.style.opacity = '0';
         document.body.append(aElement);

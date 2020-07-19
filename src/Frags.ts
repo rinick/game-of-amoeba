@@ -18,21 +18,19 @@ const float nn = 16.;
 
 const float nVirus = ${4 / 16};
   
-const float nLq0 = ${5 / 16};
-const float nLif0 = ${6 / 16};
-const float nWa0 = ${7 / 16};
+const float nLiquid0 = ${5 / 16};
+const float nLife0 = ${6 / 16};
+const float nShell0 = ${7 / 16};
 
-const float nLq1 = ${9 / 16};
-const float nLif1 = ${10 / 16};
-const float nWa1 = ${11 / 16};
+const float nLiquid1 = ${9 / 16};
+const float nLife1 = ${10 / 16};
+const float nShell1 = ${11 / 16};
 
-const float nRock = 1.0;
-
-ivec2 vLqs = ivec2(0,0); // liquid
-ivec2 vLifs = ivec2(0,0); // core 
-ivec2 vWas = ivec2(0,0); // wall 
+ivec2 vLiquid = ivec2(0,0); // liquid
+ivec2 vLife = ivec2(0,0); // core 
+ivec2 vShell = ivec2(0,0); // membrane 
 int vVirus = 0;
-int vBlocker = 0;
+int vWall = 0;
 
 void countP(vec2 pt){
   vec4 c = texture2D(buf, pt);
@@ -42,21 +40,21 @@ void countP(vec2 pt){
   } else if (v  < 4.5) {
     vVirus = vVirus + 1;
   } else if (v  < 5.5) {
-    vLqs[0] = vLqs[0] + 1;
+    vLiquid[0] = vLiquid[0] + 1;
   } else if (v  < 6.5) {
-    vLifs[0] = vLifs[0] + 1;
+    vLife[0] = vLife[0] + 1;
   } else if (v  < 7.5) {
-    vWas[0] = vWas[0] + 1;
+    vShell[0] = vShell[0] + 1;
   } else if (v  < 8.5) {
 
   } else if (v  < 9.5) {
-    vLqs[1] = vLqs[1] + 1;
+    vLiquid[1] = vLiquid[1] + 1;
   } else if (v  < 10.5) {
-    vLifs[1] = vLifs[1] + 1;
+    vLife[1] = vLife[1] + 1;
   } else if (v  < 11.5) {
-    vWas[1] = vWas[1] + 1;
+    vShell[1] = vShell[1] + 1;
   } else if (v > 15.5) {
-    vBlocker = vBlocker +1;
+    vWall = vWall + 1;
   }
 }
 void main(void) {
@@ -64,11 +62,12 @@ void main(void) {
    vec4 old = texture2D(buf, uv);
    int v =  int(old[0]*nn + 0.5);
    
-   if (v > 12) {
+   if (v > 12) { // won't change
      gl_FragColor = old;
      return;
    }
    
+   // check the 8 pixels around
    countP(uv + vec2(0., dy));
    countP(uv - vec2(0., dy));
    countP(uv + vec2(dx, 0.));
@@ -78,88 +77,88 @@ void main(void) {
    countP(uv + vec2(dx, -dy));
    countP(uv - vec2(dx, -dy));
    
-   int vLq = vLqs[0] + vLqs[1];
-   int vWa = vWas[0] + vWas[1];
-   int vLif = vLifs[0] + vLifs[1];
+   int sumLiquid = vLiquid[0] + vLiquid[1];
+   int sumShell = vShell[0] + vShell[1];
+   int sumLife = vLife[0] + vLife[1];
    
-   int vLqMe;
-   int vLifMe;
-   int vWaMe;
+   int vLiquidMe;
+   int vLifeMe;
+   int vShellMe;
    
    if (v/4 == 1) {
-       vLqMe = vLqs[0];
-       vLifMe = vLifs[0];
-       vWaMe = vWas[0];
+       vLiquidMe = vLiquid[0];
+       vLifeMe = vLife[0];
+       vShellMe = vShell[0];
    } else if (v/4 == 2) { 
-       vLqMe = vLqs[1];
-       vLifMe = vLifs[1];
-       vWaMe = vWas[1];
+       vLiquidMe = vLiquid[1];
+       vLifeMe = vLife[1];
+       vShellMe = vShell[1];
    }
-   int vLqOther = vLq - vLqMe;
-   int vLifOther = vLif - vLifMe;
-   int vWaOther = vWa - vWaMe;
+   int vLiquidOther = sumLiquid - vLiquidMe;
+   int vLifeOther = sumLife - vLifeMe;
+   int vShellOther = sumShell - vShellMe;
  
    float rslt = 0.0;
    int type = 0;
-   if (v > 4) {
+   if (v > 4 && v < 12) {
      type = int(mod(float(v),4.0));
    }
 
    if (v == 4) {
-     if (vBlocker > 3 || vVirus > 4 || (vWa+vLq+vLif > 0 && vVirus - vBlocker > 1)) {
+     if (vWall > 3 || vVirus > 4 || (sumShell + sumLiquid + sumLife > 0 && vVirus - vWall > 1)) {
        rslt = nVirus;
      } else {
        rslt = 0.0;
      } 
-   } else if ( vVirus > 0 && vBlocker < 3 && type > 0) {
+   } else if ( vVirus > 0 && vWall < 3 && type > 0) {
      rslt = nVirus;      // virus spread
    } else if (type <= 1){
-    if (vLif == 3) {      // life grows at 3 neighbors, even when one of them is enemy
-     if (vLifs[0] > vLifs[1]) {
-        rslt = nLif0;
+    if (sumLife == 3) {      // life grows at 3 neighbors, even when one of them is enemy
+     if (vLife[0] > vLife[1]) {
+        rslt = nLife0;
       } else {
-        rslt = nLif1;
+        rslt = nLife1;
       }
     } else if (type == 1) {
-      if (vLif > 3 || vLifOther > 1 || vWaOther > 0 || vLqMe == 0) { // liquid may be consumed
+      if (sumLife > 3 || vLifeOther > 1 || vShellOther > 0 || vLiquidMe == 0) { // liquid may be consumed
         rslt = 0.0;
-      } else if (vLif > 0 && vLif + vBlocker == 5 && vLq == 2) { // special rule to prevent dead loop at corner 
+      } else if (sumLife > 0 && sumLife + vWall == 5 && sumLiquid == 2) { // special rule to prevent dead loop at corner 
         rslt = 0.0;
       } else {
         rslt = old[0];
       }
     } else {
-      if (vLq == 0) {
+      if (sumLiquid == 0) {
         rslt = 0.0;
       } else {
-        if (vLif == 0) {      // try building wall
-          if (vWa > 0) {      // wall spread along liquid
-            if (vWas[0] > 0 && vLqs[0] > vLqs[1]) {
-              rslt = nWa0;
-            } else if (vWas[1] > 0 && vLqs[0] < vLqs[1]) {
-              rslt = nWa1;
+        if (sumLife == 0) {      // try building wall
+          if (sumShell > 0) {      // wall spread along liquid
+            if (vShell[0] > 0 && vLiquid[0] > vLiquid[1]) {
+              rslt = nShell0;
+            } else if (vShell[1] > 0 && vLiquid[0] < vLiquid[1]) {
+              rslt = nShell1;
             }
-          } else if (vLq == 7 || (vLqs[0] >0 && vLqs[1]>0)) {      // wall generated from just liquid
-            if (vLqs[0] > vLqs[1]) {
-              rslt = nWa0;
-            } else if (vLqs[0] < vLqs[1]) { 
-              rslt = nWa1;
+          } else if (sumLiquid == 7 || (vLiquid[0] >0 && vLiquid[1]>0)) {      // wall generated from just liquid
+            if (vLiquid[0] > vLiquid[1]) {
+              rslt = nShell0;
+            } else if (vLiquid[0] < vLiquid[1]) { 
+              rslt = nShell1;
             }
           }
-          if (rslt != 0.0 || vBlocker > 0) {
+          if (rslt != 0.0 || vWall > 0) {
             gl_FragColor = vec4(rslt,old.rgb);
             return;
           }
         }
-        if (vLq == 3 || (vLif > 0 && vLif < 3)) {      // liquid spread
-          if (vLifs[0] > vLifs[1]) {
-              rslt = nLq0;
-          } else if (vLifs[0] < vLifs[1]) {
-              rslt = nLq1;
-          } else if (vLqs[0] > vLqs[1]) {
-            rslt = nLq0;
-          } else if (vLqs[0] < vLqs[1]){
-            rslt = nLq1;
+        if (sumLiquid == 3 || (sumLife > 0 && sumLife < 3)) {      // liquid spread
+          if (vLife[0] > vLife[1]) {
+              rslt = nLiquid0;
+          } else if (vLife[0] < vLife[1]) {
+              rslt = nLiquid1;
+          } else if (vLiquid[0] > vLiquid[1]) {
+            rslt = nLiquid0;
+          } else if (vLiquid[0] < vLiquid[1]){
+            rslt = nLiquid1;
           } else {
             rslt = 0.0;
           }
@@ -169,15 +168,15 @@ void main(void) {
       }
     }
   } else if (type == 2) {
-    if (vLqMe <= vLqOther) {      // life need water to sustain
+    if (vLiquidMe <= vLiquidOther) {      // life need water to sustain
       rslt = 0.0;
     } else {
       rslt = old[0];
     }
   } else if (type == 3) {
-    if ( vLqOther == 6 && vLqMe == 1) {      // virus occur
+    if ( vLiquidOther == 6 && vLiquidMe == 1) {      // virus occur
       rslt = nVirus;
-    } else if (vLif > 1) {      // wall broken by life
+    } else if (sumLife > 1) {      // wall broken by life
       rslt = 0.0;
     } else {
       rslt = old[0];

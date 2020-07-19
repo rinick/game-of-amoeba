@@ -26,7 +26,7 @@ export function initLan() {
   }
 
   if (isEN) {
-    document.title = "Rick's Game of Amoebae";
+    document.title = "Rick's Game of Amoeba";
   } else {
     document.title = '变形虫自动机';
   }
@@ -39,7 +39,7 @@ export function t(en: string, zh: string): string {
 export function extractName(str: string) {
   let parts = str.split(/[ .-]/g);
   for (let part of parts) {
-    if (part && part !== 'amoeba' && part !== 'amoebae' && part !== 'webp' && !part.match(/^\d{12}$/)) {
+    if (part && part !== 'amoeba' && part !== 'webp' && !part.match(/^\d{12}$/)) {
       return part;
     }
   }

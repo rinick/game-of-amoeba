@@ -5,6 +5,7 @@ interface Props {
   selected: number;
   value: number;
   color: string;
+  title?: string;
   setValue: (value: number) => void;
 }
 interface State {}
@@ -15,10 +16,10 @@ export class ColorButton extends React.PureComponent<Props, State> {
     setValue?.(value);
   };
   render() {
-    let {selected, value, color} = this.props;
+    let {selected, value, color, title} = this.props;
     let cls = classNames('color-btn', {'color-btn-selected': selected === value});
     return (
-      <div className={cls} onClick={this.onClick}>
+      <div className={cls} onClick={this.onClick} title={title}>
         <div className="color-btn-color" style={{background: color}} />
       </div>
     );
