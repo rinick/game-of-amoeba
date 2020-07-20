@@ -150,7 +150,7 @@ export class App extends React.PureComponent<any, State> {
       </div>
     );
 
-    if (window.parent !== window) {
+    if (window.parent !== window || true) {
       return (
         <div className="v-box">
           <div className="h-box">

@@ -66,6 +66,8 @@ export class Stage extends React.PureComponent<Props, State> {
   checkResize(width: number, height: number) {
     let {scale} = this.props;
     let {imgW, imgH} = this.state;
+    width *= window.devicePixelRatio;
+    height *= window.devicePixelRatio;
     if (scale || imgW > width || imgH > height) {
       this.setState({canvasScale: 's', pixelated: true});
     } else {

@@ -6,6 +6,7 @@ body,
 }
 .h-box {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
 }
 .h-box > * {
@@ -20,6 +21,9 @@ body,
   width: 100%;
   position: relative;
   flex: 1 1 100%;
+}
+.v-box-content > .amoeba-stage {
+  align-items: flex-start;
 }
 .ant-layout-content {
   position: relative;
