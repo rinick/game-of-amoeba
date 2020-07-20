@@ -289,20 +289,14 @@ export class App extends React.PureComponent<any, State> {
               </div>
             ) : null}
             <div className="sider-spacer" />
-            <div
-              className="sider-last"
-              dangerouslySetInnerHTML={{
-                __html: `<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-<!-- Cellular automaton -->
-<ins class="adsbygoogle"
-     style="display:inline-block;width:300px;height:250px"
-     data-ad-client="ca-pub-3283235194066083"
-     data-ad-slot="9095307850"></ins>
-<script>
-(adsbygoogle = window.adsbygoogle || []).push({});
-</script>`,
-              }}
-            />
+            <div className="sider-last">
+              <ins
+                className="adsbygoogle"
+                style={{display: 'inline-block', width: 300, height: 250}}
+                data-ad-client="ca-pub-3283235194066083"
+                data-ad-slot="9095307850"
+              ></ins>
+            </div>
           </div>
         </Sider>
       </Layout>
