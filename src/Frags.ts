@@ -105,12 +105,12 @@ void main(void) {
    }
 
    if (v == 4) {
-     if (vWall > 3 || vVirus > 4 || (sumShell + sumLiquid + sumLife > 0 && vVirus - vWall > 1)) {
+     if (vWall >= 4 || vVirus >= 5 || (sumShell + sumLiquid + sumLife > 0 && vVirus - vWall >= 2)) {
        rslt = nVirus;
      } else {
        rslt = 0.0;
      } 
-   } else if ( vVirus > 0 && vWall < 3 && type > 0) {
+   } else if ( vVirus > 0 && vWall <= 2 && type > 0) {
      rslt = nVirus;      // virus spread
    } else if (type <= 1){
     if (sumLife == 3) {      // life grows at 3 neighbors, even when one of them is enemy
@@ -120,7 +120,7 @@ void main(void) {
         rslt = nLife1;
       }
     } else if (type == 1) {
-      if (sumLife > 3 || vLifeOther > 1 || vShellOther > 0 || vLiquidMe == 0) { // liquid may be consumed
+      if (sumLife >= 4 || vLifeOther >= 2 || vShellOther > 0 || vLiquidMe == 0) { // liquid may be consumed
         rslt = 0.0;
       } else if (sumLife > 0 && sumLife + vWall == 5 && sumLiquid == 2) { // special rule to prevent dead loop at corner 
         rslt = 0.0;
@@ -150,7 +150,7 @@ void main(void) {
             return;
           }
         }
-        if (sumLiquid == 3 || (sumLife > 0 && sumLife < 3)) {      // liquid spread
+        if (sumLiquid == 3 || (sumLife > 0 && sumLife <= 2)) {      // liquid spread
           if (vLife[0] > vLife[1]) {
               rslt = nLiquid0;
           } else if (vLife[0] < vLife[1]) {
@@ -176,7 +176,7 @@ void main(void) {
   } else if (type == 3) {
     if ( vLiquidOther == 6 && vLiquidMe == 1) {      // virus occur
       rslt = nVirus;
-    } else if (sumLife > 1) {      // wall broken by life
+    } else if (sumLife >= 2) {      // wall broken by life
       rslt = 0.0;
     } else {
       rslt = old[0];
