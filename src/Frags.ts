@@ -105,13 +105,17 @@ void main(void) {
    }
 
    if (v == 4) {
-     if (vWall >= 4 || vVirus >= 5 || (sumShell + sumLiquid + sumLife > 0 && vVirus - vWall >= 2)) {
+     if (vWall >= 2 || vVirus >= 5 || sumShell + sumLiquid + sumLife > 0) {
        rslt = nVirus;
      } else {
        rslt = 0.0;
      } 
-   } else if ( vVirus > 0 && vWall <= 2 && type > 0) {
-     rslt = nVirus;      // virus spread
+   } else if ( vVirus > 0 && type > 0) {
+     if (vWall <= 1) {
+        rslt = nVirus;      // virus spread
+     } else {
+        rslt = 0.0;
+     }
    } else if (type <= 1){
     if (sumLife == 3) {      // life grows at 3 neighbors, even when one of them is enemy
      if (vLife[0] > vLife[1]) {
